@@ -4,9 +4,10 @@
 import json
 import configparser
 import requests
+import os
 
 config = configparser.ConfigParser()
-config.read("config.ini")
+config.read(os.path.join(os.path.dirname(__file__), "config.ini"))
 
 BASE_URL = "https://imdb-api.com"
 KEY = config.get("IMDB", "apikey")
