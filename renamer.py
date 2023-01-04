@@ -1,11 +1,15 @@
 #!/usr/bin/python3
 """Renaming of movie and tv-show files"""
 
-import sys
-import os
-import re
-import parser
-import imdb
+try:
+    import sys
+    import os
+    import re
+    import parser
+    import imdb
+except ModuleNotFoundError as error:
+    print("[ERROR] {}".format(error))
+    raise SystemExit from None
 
 
 def print_help():
@@ -223,14 +227,13 @@ def main():
             imdb_data.update(data)
         metadata[i].update(imdb_data)
 
-        # build new name
+        # build new filename
         if metadata[i]["type"] == "movie":
             newname = (
                 metadata[i]["title"]
                 + " (" + metadata[i]["year"] + ")"
                 + metadata[i]["extension"]
             )
-            newname = os.path.join(metadata[i]["dirname"], newname)
         if metadata[i]["type"] == "series":
             newname = (
                 metadata[i]["title"]
@@ -239,13 +242,20 @@ def main():
                 + " - " + metadata[i]["episodeTitle"]
                 + metadata[i]["extension"]
             )
-            newname = os.path.join(metadata[i]["dirname"], newname)
+
+        # sanitizing filename
+        newname = re.sub(r"[<>\"/\\|\?\*]", "", newname)
+        newname = re.sub("[:]", " - ", newname)
+        newname = re.sub(" {2,}", " ", newname)
+
+        # build path
+        abspath = os.path.join(metadata[i]["dirname"], newname)
 
         # rename file
         try:
             if not options["simulate"]:
-                os.rename(i, newname)
-            print('[INFO] Renaming "{}" to "{}"'.format(os.path.basename(i), os.path.basename(newname)))
+                os.rename(i, abspath)
+            print('[INFO] Renaming "{}" to "{}"'.format(os.path.basename(i), os.path.basename(abspath)))
         except OSError as error:
             print("[ERROR] {}".format(error))
             continue
