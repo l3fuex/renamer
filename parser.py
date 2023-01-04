@@ -26,7 +26,7 @@ def file_parser(file):
     data = {}
 
     # extract title either from dirname or from filename
-    pattern = "(?:.*/)(.*)(19[3-9]\\d|20[0-2]\\d)(.*)(1080|720)(.*)"
+    pattern = "(?:.*/)(.*)(19|20)(\\d\\d)(.*)(720|1080|2160)(.*)"
     result = re.match(pattern, abspath)
     if result:
         title = result.group(1)
