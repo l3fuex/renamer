@@ -1,8 +1,12 @@
 #!/usr/bin/python3
 """Various parser implementations."""
 
-import os
-import re
+try:
+    import os
+    import re
+except ModuleNotFoundError as error:
+    print("[ERROR] {}".format(error))
+    raise SystemExit from None
 
 
 def file_parser(file):

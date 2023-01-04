@@ -1,10 +1,15 @@
 #!/usr/bin/python3
 """Implementation of the IMDB API"""
 
-import json
-import configparser
-import requests
-import os
+try:
+    import json
+    import configparser
+    import os
+    import requests
+except ModuleNotFoundError as error:
+    print("[ERROR] {}".format(error))
+    raise SystemExit from None
+
 
 config = configparser.ConfigParser()
 config.read(os.path.join(os.path.dirname(__file__), "config.ini"))
