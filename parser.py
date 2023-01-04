@@ -52,13 +52,12 @@ def file_parser(file):
         pattern = line.strip()
         title = re.sub(pattern, "", title, flags=re.IGNORECASE)
 
-    # replace special chars
-    title = re.sub("[._\\-\\(\\)\\[\\]]", " ", title)
+    # delete special chars
+    title = re.sub(r"[._\-\(\)\[\]]", " ", title)
     title = re.sub(" {2,}", " ", title)
 
     # match for series pattern
-    #pattern = "(^.*)(?:[sS])([1-9]|[0-9][1-9])(?:[eE])(\\d{1,2})"
-    pattern = "(^.*)(?:[sS])(\\d{1,2})(?:[eE])(\\d{1,2})"
+    pattern = r"(^.*)(?:[sS])(\d{1,2})(?:[eE])(\d{1,2})"
     result = re.match(pattern, os.path.basename(fullname))
     if result:
         data["type"] = "series"
