@@ -39,7 +39,8 @@ def file_parser(file):
 
     # cut keywords from title
     try:
-        file_object = open("keywords.txt", "r")
+        keywords = os.path.join(os.path.dirname(__file__), "keywords.txt")
+        file_object = open(keywords, "r")
     except Exception as error:
         print("[ERROR] {}".format(error))
         return None
@@ -90,7 +91,7 @@ def info_parser(file):
         data (dict): key value pairs of parsed data
     """
     fullname = os.path.splitext(file)[0]
-    directory = os.path.dirname(file)
+    directory = os.path.dirname(os.path.abspath(file))
     data = {}
 
     # search for related .nfo file
