@@ -200,11 +200,15 @@ def main():
                 if options["debug"]:
                     print("[DEBUG] entering search mode")
                 if metadata[i]["type"] == "movie":
-                    search = imdb.search_movie(metadata[i]["title"], options["debug"])
+                    string = metadata[i]["title"] + " " + metadata[i].get("year", "")
+                    print(string)
+                    search = imdb.search_movie(string, options["debug"])
                     index = select_result(search)
                     metadata[i]["id"] = search["results"][index]["id"]
                     response = imdb.get_title(metadata[i]["id"], options["debug"])
                 if metadata[i]["type"] == "series":
+                    string = metadata[i]["title"] + " " + metadata[i].get("year", "")
+                    print(string)
                     search = imdb.search_series(metadata[i]["title"], options["debug"])
                     index = select_result(search)
                     metadata[i]["id"] = search["results"][index]["id"]
