@@ -81,7 +81,7 @@ def file_parser(file):
     title = re.sub(r"[._\-\(\)\[\]]", " ", title)
     title = re.sub(" {2,}", " ", title)
 
-    data["title"] = title
+    data["title"] = title.strip()
 
     return data
 
