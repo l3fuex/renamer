@@ -4,7 +4,6 @@
 try:
     import os
     import re
-    import cv2
 except ModuleNotFoundError as error:
     print("[ERROR] {}".format(error))
     raise SystemExit from None
@@ -34,16 +33,6 @@ def file_parser(file):
     data["extension"] = os.path.splitext(file)[1]
     data["filename"] = os.path.basename(fullname)
     data["dirname"] = os.path.dirname(fullname)
-
-    """
-    # extract duration
-    video_data = cv2.VideoCapture(file)
-    frames = video_data.get(cv2.CAP_PROP_FRAME_COUNT)
-    fps = video_data.get(cv2.CAP_PROP_FPS)
-    if frames and fps:
-        seconds = round(frames / fps)
-        data["runtime"] = round(seconds / 60)
-    """
 
     # extract year
     pattern = ".*(19\d\d|20\d\d).*"
