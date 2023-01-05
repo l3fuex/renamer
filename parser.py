@@ -4,6 +4,7 @@
 try:
     import os
     import re
+    import cv2
 except ModuleNotFoundError as error:
     print("[ERROR] {}".format(error))
     raise SystemExit from None
@@ -29,7 +30,43 @@ def file_parser(file):
     abspath = os.path.abspath(file)
     data = {}
 
-    # extract title either from dirname or from filename
+    # extract filesystem information
+    data["extension"] = os.path.splitext(file)[1]
+    data["filename"] = os.path.basename(fullname)
+    data["dirname"] = os.path.dirname(fullname)
+
+    """
+    # extract duration
+    video_data = cv2.VideoCapture(file)
+    frames = video_data.get(cv2.CAP_PROP_FRAME_COUNT)
+    fps = video_data.get(cv2.CAP_PROP_FPS)
+    if frames and fps:
+        seconds = round(frames / fps)
+        data["runtime"] = round(seconds / 60)
+    """
+
+    # extract year
+    pattern = ".*(19\d\d|20\d\d).*"
+    result = re.match(pattern, abspath)
+    if result:
+        data["year"] = result.group(1)
+
+    # extract media type
+    pattern = r"(^.*)(?:[sS])(\d{1,2})(?:[eE])(\d{1,2})(?:.*)"
+    result = re.match(pattern, abspath)
+    if result:
+        data["type"] = "series"
+    else:
+        data["type"] = "movie"
+
+    # extract season and episode number
+    if data["type"] == "series":
+        pattern = r"(^.*)(?:[sS])(\d{1,2})(?:[eE])(\d{1,2})(?:.*)"
+        result = re.match(pattern, abspath)
+        data["season"] = result.group(2)
+        data["episode"] = result.group(3)
+
+    # extract title
     pattern = "(?:.*/)(.*)(19|20)(\\d\\d)(.*)(720|1080|2160)(.*)"
     result = re.match(pattern, abspath)
     if result:
@@ -37,43 +74,14 @@ def file_parser(file):
     else:
         title = os.path.basename(fullname)
 
-    # cut keywords from title
-    try:
-        keywords = os.path.join(os.path.dirname(__file__), "keywords.txt")
-        file_object = open(keywords, "r")
-    except Exception as error:
-        print("[ERROR] {}".format(error))
-        return None
-    else:
-        content = file_object.readlines()
-    finally:
-        file_object.close()
-
-    for line in content:
-        pattern = line.strip()
-        title = re.sub(pattern, "", title, flags=re.IGNORECASE)
-
-    # delete special chars
+    title = re.sub(r"(720|1080|2160)[pP]?", "", title)
+    title = re.sub(r"[xX]26[4,5]", "", title)
+    title = re.sub(r"(blueray|dubbed|repack)", "", title, flags=re.IGNORECASE)
+    title = re.sub(r"[sS]\d{1,2}[eE]\d{1,2}.*", "", title)
     title = re.sub(r"[._\-\(\)\[\]]", " ", title)
     title = re.sub(" {2,}", " ", title)
 
-    # match for series pattern
-    pattern = r"(^.*)(?:[sS])(\d{1,2})(?:[eE])(\d{1,2})"
-    result = re.match(pattern, os.path.basename(fullname))
-    if result:
-        data["type"] = "series"
-        data["extension"] = os.path.splitext(file)[1]
-        data["filename"] = os.path.basename(fullname)
-        data["dirname"] = os.path.dirname(fullname)
-        data["title"] = result.group(1).strip()
-        data["season"] = result.group(2)
-        data["episode"] = result.group(3)
-    else:
-        data["type"] = "movie"
-        data["extension"] = os.path.splitext(file)[1]
-        data["filename"] = os.path.basename(fullname)
-        data["dirname"] = os.path.dirname(fullname)
-        data["title"] = title.strip()
+    data["title"] = title
 
     return data
 
