@@ -56,18 +56,21 @@ def file_parser(file):
         data["episode"] = result.group(3)
 
     # extract title
-    pattern = "(?:.*/)(.*)(19|20)(\\d\\d)(.*)(720|1080|2160)(.*)"
+    if data["type"] == "series":
+        pattern = "(?:.*/)(.*)([sS]\d{1,2}[eE]\d{1,2})(.*)(720|1080|2160|x26[4,5])(.*)"
+    if data["type"] == "movie":
+        pattern = "(?:.*/)(.*)(19|20)(\\d\\d)(.*)(720|1080|2160|x26[4,5])(.*)"
     result = re.match(pattern, abspath)
     if result:
         title = result.group(1)
     else:
         title = os.path.basename(fullname)
+        title = re.sub(r"(720|1080|2160)[p]?", "", title, flags=re.IGNORECASE)
+        title = re.sub(r"x26[4,5]", "", title, flags=re.IGNORECASE)
+        title = re.sub(r"(blueray|dubbed|repack)", "", title, flags=re.IGNORECASE)
+        title = re.sub(r"[s]\d{1,2}[e]\d{1,2}.*", "", title, flags=re.IGNORECASE)
+        title = re.sub(r"(\(|\[)(\d\d\d\d)(\)|\])", "", title)
 
-    title = re.sub(r"(720|1080|2160)[pP]?", "", title)
-    title = re.sub(r"[xX]26[4,5]", "", title)
-    title = re.sub(r"(blueray|dubbed|repack)", "", title, flags=re.IGNORECASE)
-    title = re.sub(r"(\(|\[)(\d\d\d\d)(\)|\])", "", title)
-    title = re.sub(r"[sS]\d{1,2}[eE]\d{1,2}.*", "", title)
     title = re.sub(r"[._\-\(\)\[\]]", " ", title)
     title = re.sub(" {2,}", " ", title)
 
