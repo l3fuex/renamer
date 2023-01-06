@@ -7,6 +7,7 @@ try:
     import re
     import parser
     import imdb
+    import json
 except ModuleNotFoundError as error:
     print("[ERROR] {}".format(error))
     raise SystemExit from None
@@ -176,7 +177,7 @@ def main():
     # collect data from imdb
     prevtitle, prevseason = None, None
     for i in metadata:
-        for n in range(1, 5):
+        while True:
             # batch mode
             if metadata[i]["title"] == prevtitle:
                 if options["debug"]:
@@ -202,17 +203,23 @@ def main():
             else:
                 if options["debug"]:
                     print("[DEBUG] entering search mode")
+                if metadata[i]["type"] == "series":
+                    metadata[i].pop("runtime", None)
                 search = imdb.advanced_search(metadata[i]["type"], metadata[i]["title"], metadata[i].get("year"), metadata[i].get("runtime"), options["debug"])
                 index = select_result(search)
-                if index is None and n == 1:
-                    metadata[i]["year"] = None
-                    continue
-                if index is None and n == 2:
-                    metadata[i]["runtime"] = None
-                    continue
-                if index is None and n == 3:
-                    print("[ERROR] nothing found")
-                    break
+                if index is None:
+                    if "year" in metadata[i] and "runtime" in metadata[i]:
+                        metadata[i].pop("year")
+                        continue
+                    if "year" not in metadata[i] and "runtime" in metadata[i]:
+                        metadata[i].pop("runtime")
+                        continue
+                    if "year" in metadata[i] and "runtime" not in metadata[i]:
+                        metadata[i].pop("year")
+                        continue
+                    if "year" not in metadata[i] and "runtime" not in metadata[i]:
+                        print("[ERROR] nothing found")
+                        break
                 metadata[i]["id"] = search["results"][index]["id"]
 
         # save title and season for next iteration (needed for batch mode)
