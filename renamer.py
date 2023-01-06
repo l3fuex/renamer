@@ -176,7 +176,7 @@ def main():
     # collect data from imdb
     prevtitle, prevseason = None, None
     for i in metadata:
-        for n in range(1, 4):
+        for n in range(1, 5):
             # batch mode
             if metadata[i]["title"] == prevtitle:
                 if options["debug"]:
@@ -202,15 +202,7 @@ def main():
             else:
                 if options["debug"]:
                     print("[DEBUG] entering search mode")
-                """
-                if n == 1:
-                    search = imdb.advanced_search(metadata[i]["type"], metadata[i]["title"], metadata[i]["year"], metadata[i]["runtime"], options["debug"])
-                    index = select_result(search)
-                    if index is not None:
-                        metadata[i]["id"] = search["results"][index]["id"]
-                        break
-                """
-                search = imdb.advanced_search(metadata[i]["type"], metadata[i]["title"], metadata[i]["year"], metadata[i]["runtime"], options["debug"])
+                search = imdb.advanced_search(metadata[i]["type"], metadata[i]["title"], metadata[i].get("year"), metadata[i].get("runtime"), options["debug"])
                 index = select_result(search)
                 if index is None and n == 1:
                     metadata[i]["year"] = None
