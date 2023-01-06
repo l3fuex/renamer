@@ -7,7 +7,6 @@ try:
     import re
     import parser
     import imdb
-    import json
 except ModuleNotFoundError as error:
     print("[ERROR] {}".format(error))
     raise SystemExit from None
@@ -168,8 +167,8 @@ def main():
     # parse files in sys.argv for related metadata
     metadata = {}
     for i in sys.argv:
-        filedata = parser.file_parser(i)
-        infodata = parser.info_parser(i)
+        filedata = parser.file_parser(i, options["debug"])
+        infodata = parser.info_parser(i, options["debug"])
         metadata[i] = {}
         metadata[i].update(filedata)
         metadata[i].update(infodata)

@@ -5,12 +5,13 @@ try:
     import os
     import re
     import cv2
+    import json
 except ModuleNotFoundError as error:
     print("[ERROR] {}".format(error))
     raise SystemExit from None
 
 
-def file_parser(file):
+def file_parser(file, debug=False):
     """Extracts basic file information like extension, dirname, title.
 
     Depending, if a special pattern matches the path, the title gets extracted
@@ -86,10 +87,13 @@ def file_parser(file):
 
     data["title"] = title.strip()
 
+    if debug:
+        print("[DEBUG] file parser output: {}".format(json.dumps(data, indent=2)))
+
     return data
 
 
-def info_parser(file):
+def info_parser(file, debug=False):
     """Parses .nfo file related information.
 
     Searches for related .nfo files, parses them and returns the parsed
@@ -130,6 +134,9 @@ def info_parser(file):
         result = re.findall(pattern, content, re.IGNORECASE)
         if result:
             data["id"] = result[0]
+
+    if debug:
+        print("[DEBUG] info parser output: {}".format(json.dumps(data, indent=2)))
 
     return data
 
