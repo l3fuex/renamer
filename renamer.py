@@ -40,13 +40,13 @@ def select_result(response):
     will be set to 0 and the processing ends. If there are more than one
     entries in the search response the user is asked to make a choise.
     The corresponding index value will then be returned.
-    Any other condition will raise an error.
+    Any other condition will return 'None' as index value.
 
     Args:
         response (dict): imdb-api search response
 
     Returns:
-        index (int): corresponding index value
+        index (int, None): corresponding index value
     """
     if len(response["results"]) == 1:
         index = 0
@@ -57,7 +57,7 @@ def select_result(response):
                 index + 1,
                 result["title"],
                 result["description"],
-                result["resultType"]
+                result["genres"]
                 )
             )
         while True:
@@ -76,7 +76,7 @@ def select_result(response):
             break
 
     else:
-        raise ValueError("no search results found for \"" + response["expression"] + "\"")
+        index = None
 
     return index
 
@@ -176,7 +176,7 @@ def main():
     # collect data from imdb
     prevtitle, prevseason = None, None
     for i in metadata:
-        try:
+        for n in range(1, 4):
             # batch mode
             if metadata[i]["title"] == prevtitle:
                 if options["debug"]:
@@ -185,37 +185,43 @@ def main():
                     metadata[i]["id"] = search["results"][index]["id"]
                     data = imdb.get_episodes(metadata[i]["id"], metadata[i]["season"], options["debug"])
                     response.update(data)
+                    break
             # title mode
             elif "id" in metadata[i]:
                 if options["debug"]:
                     print("[DEBUG] entering title mode")
                 if metadata[i]["type"] == "movie":
                     response = imdb.get_title(metadata[i]["id"], options["debug"])
+                    break
                 if metadata[i]["type"] == "series":
                     response = imdb.get_title(metadata[i]["id"], options["debug"])
                     data = imdb.get_episodes(metadata[i]["id"], metadata[i]["season"], options["debug"])
                     response.update(data)
+                    break
             # search mode
             else:
                 if options["debug"]:
                     print("[DEBUG] entering search mode")
-                if metadata[i]["type"] == "movie":
-                    string = metadata[i]["title"] + " " + metadata[i].get("year", "")
-                    search = imdb.search_movie(string, options["debug"])
+                """
+                if n == 1:
+                    search = imdb.advanced_search(metadata[i]["type"], metadata[i]["title"], metadata[i]["year"], metadata[i]["runtime"], options["debug"])
                     index = select_result(search)
-                    metadata[i]["id"] = search["results"][index]["id"]
-                    response = imdb.get_title(metadata[i]["id"], options["debug"])
-                if metadata[i]["type"] == "series":
-                    string = metadata[i]["title"] + " " + metadata[i].get("year", "")
-                    search = imdb.search_series(metadata[i]["title"], options["debug"])
-                    index = select_result(search)
-                    metadata[i]["id"] = search["results"][index]["id"]
-                    response = imdb.get_title(metadata[i]["id"], options["debug"])
-                    data = imdb.get_episodes(metadata[i]["id"], metadata[i]["season"], options["debug"])
-                    response.update(data)
-        except ValueError as error:
-            print("[ERROR] {}".format(error))
-            continue
+                    if index is not None:
+                        metadata[i]["id"] = search["results"][index]["id"]
+                        break
+                """
+                search = imdb.advanced_search(metadata[i]["type"], metadata[i]["title"], metadata[i]["year"], metadata[i]["runtime"], options["debug"])
+                index = select_result(search)
+                if index is None and n == 1:
+                    metadata[i]["year"] = None
+                    continue
+                if index is None and n == 2:
+                    metadata[i]["runtime"] = None
+                    continue
+                if index is None and n == 3:
+                    print("[ERROR] nothing found")
+                    break
+                metadata[i]["id"] = search["results"][index]["id"]
 
         # save title and season for next iteration (needed for batch mode)
         prevtitle = metadata[i]["title"]
