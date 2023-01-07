@@ -5,7 +5,6 @@ try:
     import os
     import re
     import cv2
-    import json
 except ModuleNotFoundError as error:
     print("[ERROR] {}".format(error))
     raise SystemExit from None
@@ -77,7 +76,7 @@ def file_parser(file, debug=False):
         title = os.path.basename(fullname)
 
     title = re.sub(r"[._\-\(\)\[\]]", " ", title)
-    title = re.sub(r"( dc| director['`']?s cut)", "", title, flags=re.IGNORECASE)
+    #title = re.sub(r"( dc| director['`']?s cut)", "", title, flags=re.IGNORECASE)
     title = re.sub(r"(blueray|dubbed|repack)", "", title, flags=re.IGNORECASE)
     title = re.sub(r"(720|1080|2160)[p]?", "", title, flags=re.IGNORECASE)
     title = re.sub(r"x26[4,5]", "", title, flags=re.IGNORECASE)
@@ -88,7 +87,7 @@ def file_parser(file, debug=False):
     data["title"] = title.strip()
 
     if debug:
-        print("[DEBUG] file parser output: {}".format(json.dumps(data, indent=2)))
+        print("[DEBUG] file parser output: {}".format(data))
 
     return data
 
@@ -136,7 +135,7 @@ def info_parser(file, debug=False):
             data["id"] = result[0]
 
     if debug:
-        print("[DEBUG] info parser output: {}".format(json.dumps(data, indent=2)))
+        print("[DEBUG] info parser output: {}".format(data))
 
     return data
 

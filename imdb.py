@@ -77,7 +77,7 @@ def search_series(series_title, debug=False):
 def advanced_search(media_type, title, year, runtime, debug=False):
     """Builds the AdvancedSearch API call."""
     check_key()
-
+    # build api call
     if media_type == "movie":
         string = "&title_type=feature,tv_movie,video"
     if media_type == "series":
@@ -86,8 +86,6 @@ def advanced_search(media_type, title, year, runtime, debug=False):
         string += "&release_date=" + str(year) + "-01-01," + str(year) + "-12-31"
     if runtime is not None:
         string += "&runtime=" + str(runtime-5) + "," + str(runtime+5)
-
-    # build api call
     url = (
         BASE_URL + "/" +
         "API/AdvancedSearch" + "/" +
@@ -95,7 +93,6 @@ def advanced_search(media_type, title, year, runtime, debug=False):
         "title=" + title +
         string
     )
-
     if debug:
         print("[DEBUG] sending api call {}".format(url))
     return api_call(url)
