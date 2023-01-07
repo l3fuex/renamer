@@ -32,60 +32,6 @@ def print_help():
     print("    ./renamer Futurama/Season\\ {01..03}/*.mkv")
 
 
-def imdb_lookup(metadata, ptitle, pseason, debug):
-    while True:
-        # batch mode
-        print(metadata["title"])
-        print(ptitle)
-        if metadata["title"] == ptitle:
-            print(metadata["season"])
-            print(pseason)
-            if debug:
-                print("[DEBUG] entering batch mode")
-            if metadata["type"] == "series" and metadata["season"] == pseason:
-                break
-            if metadata["type"] == "series" and metadata["season"] != pseason:
-                metadata["id"] = search["results"][index]["id"]
-                data = imdb.get_episodes(metadata["id"], metadata["season"], debug)
-                response.update(data)
-                break
-        # title mode
-        elif "id" in metadata:
-            if debug:
-                print("[DEBUG] entering title mode")
-            if metadata["type"] == "movie":
-                response = imdb.get_title(metadata["id"], debug)
-                break
-            if metadata["type"] == "series":
-                response = imdb.get_title(metadata["id"], debug)
-                data = imdb.get_episodes(metadata["id"], metadata["season"], debug)
-                response.update(data)
-                break
-        # search mode
-        else:
-            if debug:
-                print("[DEBUG] entering search mode")
-            if metadata["type"] == "series":
-                metadata.pop("runtime", None)
-            search = imdb.advanced_search(metadata["type"], metadata["title"], metadata.get("year"), metadata.get("runtime"), debug)
-            index = select_result(search)
-            if index is None:
-                if "year" in metadata and "runtime" in metadata:
-                    metadata.pop("year")
-                    continue
-                if "year" not in metadata and "runtime" in metadata:
-                    metadata.pop("runtime")
-                    continue
-                if "year" in metadata and "runtime" not in metadata:
-                    metadata.pop("year")
-                    continue
-                if "year" not in metadata and "runtime" not in metadata:
-                    raise ValueError("nothing found for title " + "\"" + metadata["title"] + "\"")
-            metadata["id"] = search["results"][index]["id"]
-
-    return response, metadata["title"], metadata.get("season")
-
-
 def select_result(response):
     """Select the correct result from an imdb search request and get
     the corresponding index value.
@@ -227,19 +173,66 @@ def main():
         metadata[i].update(filedata)
         metadata[i].update(infodata)
 
+    # collect data from imdb
     ptitle, pseason = None, None
     for i in metadata:
-        # collect data from imdb
         try:
-            response, ptitle, pseason = imdb_lookup(metadata[i], ptitle, pseason, options["debug"])
+            while True:
+                # batch mode
+                if metadata[i]["title"] == ptitle:
+                    if options["debug"]:
+                        print("[DEBUG] entering batch mode")
+                    if metadata[i]["type"] == "series" and metadata[i]["season"] == pseason:
+                        break
+                    if metadata[i]["type"] == "series" and metadata[i]["season"] != pseason:
+                        metadata[i]["id"] = search["results"][index]["id"]
+                        data = imdb.get_episodes(metadata[i]["id"], metadata[i]["season"], options["debug"])
+                        response.update(data)
+                        break
+                # title mode
+                elif "id" in metadata[i]:
+                    if options["debug"]:
+                        print("[DEBUG] entering title mode")
+                    if metadata[i]["type"] == "movie":
+                        response = imdb.get_title(metadata[i]["id"], options["debug"])
+                        break
+                    if metadata[i]["type"] == "series":
+                        response = imdb.get_title(metadata[i]["id"], options["debug"])
+                        data = imdb.get_episodes(metadata[i]["id"], metadata[i]["season"], options["debug"])
+                        response.update(data)
+                        break
+                # search mode
+                else:
+                    if options["debug"]:
+                        print("[DEBUG] entering search mode")
+                    if metadata[i]["type"] == "series":
+                        metadata[i].pop("runtime", None)
+                    search = imdb.advanced_search(metadata[i]["type"], metadata[i]["title"], metadata[i].get("year"), metadata[i].get("runtime"), options["debug"])
+                    index = select_result(search)
+                    if index is None:
+                        if "year" in metadata[i] and "runtime" in metadata[i]:
+                            metadata[i].pop("year")
+                            continue
+                        if "year" not in metadata[i] and "runtime" in metadata[i]:
+                            metadata[i].pop("runtime")
+                            continue
+                        if "year" in metadata[i] and "runtime" not in metadata[i]:
+                            metadata[i].pop("year")
+                            continue
+                        if "year" not in metadata[i] and "runtime" not in metadata[i]:
+                            raise ValueError("nothing found for title " + "\"" + metadata[i]["title"] + "\"")
+                    metadata[i]["id"] = search["results"][index]["id"]
         except ValueError as error:
             print("[ERROR] {}".format(error))
             continue
 
+        ptitle = metadata[i]["title"]
+        pseason = metadata[i].get("season")
+
         # add imdb data to meta data
         imdb_data = parser.dict_parser(response, ["id", "title", "year", "genres"])
         if metadata[i]["type"] == "series":
-            episode = int(metadata[i]["episode"]) - 1
+            episode = int(metadata[i]["episode"]) - 1 
             data = parser.dict_parser(response["episodes"][episode], ["episodeTitle"])
             imdb_data.update(data)
         metadata[i].update(imdb_data)
