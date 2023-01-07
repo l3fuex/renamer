@@ -21,7 +21,7 @@ def file_parser(file, debug=False):
     different keywords from the string.
 
     Args:
-        file (string): file to be parsed
+        file (str): file to be parsed
 
     Returns:
         data (dict): key value pairs of parsed data
@@ -75,13 +75,13 @@ def file_parser(file, debug=False):
     else:
         title = os.path.basename(fullname)
 
+    title = re.sub(r"(\(|\[)(\d\d\d\d)(\)|\])", "", title)
     title = re.sub(r"[._\-\(\)\[\]]", " ", title)
-    #title = re.sub(r"( dc| director['`']?s cut)", "", title, flags=re.IGNORECASE)
+    title = re.sub(r"director['`']?s cut", "", title, flags=re.IGNORECASE)
     title = re.sub(r"(blueray|dubbed|repack)", "", title, flags=re.IGNORECASE)
     title = re.sub(r"(720|1080|2160)[p]?", "", title, flags=re.IGNORECASE)
     title = re.sub(r"x26[4,5]", "", title, flags=re.IGNORECASE)
     title = re.sub(r"[s]\d{1,2}[e]\d{1,2}.*", "", title, flags=re.IGNORECASE)
-    title = re.sub(r"(\(|\[)(\d\d\d\d)(\)|\])", "", title)
     title = re.sub(" {2,}", " ", title)
 
     data["title"] = title.strip()
@@ -99,7 +99,7 @@ def info_parser(file, debug=False):
     information.
 
     Args:
-        file (string): file to be parsed
+        file (str): file to be parsed
 
     Returns:
         data (dict): key value pairs of parsed data

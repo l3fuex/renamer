@@ -3,7 +3,6 @@
 
 try:
     import json
-    import configparser
     import os
     import requests
 except ModuleNotFoundError as error:
@@ -11,38 +10,39 @@ except ModuleNotFoundError as error:
     raise SystemExit from None
 
 
-config = configparser.ConfigParser()
-config.read(os.path.join(os.path.dirname(__file__), "config.ini"))
-
 BASE_URL = "https://imdb-api.com"
-KEY = config.get("IMDB", "apikey")
-LANG = config.get("IMDB", "language")
 
 
-def check_key():
-    """Raises a SystemExit if no API key is present."""
-    if not KEY:
+def check_key(key):
+    """Raises a SystemExit if no API key is present.
+
+    Args:
+        key (str): API key
+    """
+    if not key:
         print("[ERROR] No API key!")
         raise SystemExit
 
 
-def search_movie(movie_title, debug=False):
+def search_movie(key, lang, movie_title, debug=False):
     """Builds the SearchMovie API call.
 
     Args:
-        movie_title (string): search string
-        debug (boolean): enable / disbale debug output
+        key (str): API key
+        lang (str): language
+        movie_title (str): search string
+        debug (bool): enable / disbale debug output
 
     Returns:
         api_call (dict): API response
     """
-    check_key()
+    check_key(key)
     # build api call
     url = (
         BASE_URL + "/" +
-        LANG + "/" +
+        lang + "/" +
         "API/SearchMovie" + "/" +
-        KEY + "/" +
+        key + "/" +
         movie_title
     )
     if debug:
@@ -50,23 +50,25 @@ def search_movie(movie_title, debug=False):
     return api_call(url)
 
 
-def search_series(series_title, debug=False):
+def search_series(key, lang, series_title, debug=False):
     """Builds the SearchSeries API call.
 
     Args:
-        series_title (string): search string
-        debug (boolean): enable / disbale debug output
+        key (str): API key
+        lang (str): language
+        series_title (str): search string
+        debug (bool): enable / disbale debug output
 
     Returns:
         api_call (dict): API response
     """
-    check_key()
+    check_key(key)
     # build api call
     url = (
         BASE_URL + "/" +
-        LANG + "/" +
+        lang + "/" +
         "API/SearchSeries" + "/" +
-        KEY + "/" +
+        key + "/" +
         series_title
     )
     if debug:
@@ -74,9 +76,21 @@ def search_series(series_title, debug=False):
     return api_call(url)
 
 
-def advanced_search(media_type, title, year, runtime, debug=False):
-    """Builds the AdvancedSearch API call."""
-    check_key()
+def advanced_search(key, lang, media_type, title, year, runtime, debug=False):
+    """Builds the AdvancedSearch API call.
+    Args:
+        key (str): API key
+        lang (str): language
+        media_type (str): movie or series
+        title (str): media title
+        year (str): release date
+        runtime (int): runtime in minutes
+        debug (bool): enable / disbale debug output
+
+    Returns:
+        api_call (dict): API response
+    """
+    check_key(key)
     # build api call
     if media_type == "movie":
         string = "&title_type=feature,tv_movie,video"
@@ -89,7 +103,7 @@ def advanced_search(media_type, title, year, runtime, debug=False):
     url = (
         BASE_URL + "/" +
         "API/AdvancedSearch" + "/" +
-        KEY + "?" +
+        key + "?" +
         "title=" + title +
         string
     )
@@ -98,23 +112,25 @@ def advanced_search(media_type, title, year, runtime, debug=False):
     return api_call(url)
 
 
-def get_title(imdb_id, debug=False):
+def get_title(key, lang, imdb_id, debug=False):
     """Builds the Title API call.
 
     Args:
-        imdb_id (string): imdbID
-        debug (boolean): enable / disbale debug output
+        key (str): API key
+        lang (str): language
+        imdb_id (str): imdbID
+        debug (bool): enable / disbale debug output
 
     Returns:
         api_call (dict): API response
     """
-    check_key()
+    check_key(key)
     # build api call
     url = (
         BASE_URL + "/" +
-        LANG + "/" +
+        lang + "/" +
         "API/Title" + "/" +
-        KEY + "/" +
+        key + "/" +
         imdb_id
     )
     if debug:
@@ -122,24 +138,26 @@ def get_title(imdb_id, debug=False):
     return api_call(url)
 
 
-def get_episodes(imdb_id, season, debug=False):
+def get_episodes(key, lang, imdb_id, season, debug=False):
     """Builds the SeasonEpisode API call.
 
     Args:
-        imdb_id (string): imdbID
-        season (string): season number
-        debug (boolean): enable / disbale debug output
+        key (str): API key
+        lang (str): language
+        imdb_id (str): imdbID
+        season (str): season number
+        debug (bool): enable / disbale debug output
 
     Returns:
         api_call (dict): API response
     """
-    check_key()
+    check_key(key)
     # build api call
     url = (
         BASE_URL + "/" +
-        LANG + "/" +
+        lang + "/" +
         "API/SeasonEpisodes" + "/" +
-        KEY + "/" +
+        key + "/" +
         imdb_id + "/" +
         season
     )
@@ -160,7 +178,7 @@ def api_call(url):
     """Sends a request with a given API call.
 
     Args:
-        url (string): API call
+        url (str): API call
 
     Returns:
         api_call (dict): API response
