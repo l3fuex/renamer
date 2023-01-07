@@ -185,7 +185,7 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
                 print("[DEBUG] entering search mode")
             if metadata["type"] == "series":
                 metadata.pop("runtime", None)
-            search = imdb.advanced_search(KEY, LANG, metadata["type"], metadata["title"], metadata.get("year"), metadata.get("runtime"), debug)
+            search = imdb.advanced_search(KEY, metadata["type"], metadata["title"], metadata.get("year"), metadata.get("runtime"), debug)
             index = select_result(search)
             if index is None:
                 if "year" in metadata:

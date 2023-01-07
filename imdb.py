@@ -3,7 +3,6 @@
 
 try:
     import json
-    import os
     import requests
 except ModuleNotFoundError as error:
     print("[ERROR] {}".format(error))
@@ -76,11 +75,10 @@ def search_series(key, lang, series_title, debug=False):
     return api_call(url)
 
 
-def advanced_search(key, lang, media_type, title, year, runtime, debug=False):
+def advanced_search(key, media_type, title, year, runtime, debug=False):
     """Builds the AdvancedSearch API call.
     Args:
         key (str): API key
-        lang (str): language
         media_type (str): movie or series
         title (str): media title
         year (str): release date

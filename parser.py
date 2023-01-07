@@ -44,7 +44,7 @@ def file_parser(file, debug=False):
         data["runtime"] = round(seconds / 60)
 
     # extract year
-    pattern = ".*(19\d\d|20\d\d).*"
+    pattern = r".*(19\d\d|20\d\d).*"
     result = re.match(pattern, abspath)
     if result:
         data["year"] = result.group(1)
@@ -66,9 +66,9 @@ def file_parser(file, debug=False):
 
     # extract title
     if data["type"] == "series":
-        pattern = "(?:.*/)(.*)([sS]\d{1,2}[eE]\d{1,2})(.*)(720|1080|2160|x26[4,5])(.*)"
+        pattern = r"(?:.*/)(.*)([sS]\d{1,2}[eE]\d{1,2})(.*)(720|1080|2160|x26[4,5])(.*)"
     if data["type"] == "movie":
-        pattern = "(?:.*/)(.*)(19|20)(\\d\\d)(.*)(720|1080|2160|x26[4,5])(.*)"
+        pattern = r"(?:.*/)(.*)(19|20)(\d\d)(.*)(720|1080|2160|x26[4,5])(.*)"
     result = re.match(pattern, abspath)
     if result:
         title = result.group(1)
