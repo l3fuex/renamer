@@ -145,8 +145,6 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
     title and type are mandatory, anything else is optional in this context
 
     Args;
-        key (str): API key
-        lang (str): language
         metadata (dict): dictionary containing metadata information
         ptitle (str): previous title needed for batch mode
         pseason (str): previous season needed for batch mode
@@ -315,9 +313,9 @@ def main():
                 + metadata[i]["extension"]
             )
 
-        # sanitizing filename
-        newname = re.sub(r"[<>\"/\\|\?\*]", "", newname)
-        newname = re.sub("[:]", " - ", newname)
+        # sanitize filename
+        newname = re.sub(r"[\*\?<>\"|\\/]", "", newname)
+        newname = re.sub(":", "\ua789", newname)
         newname = re.sub(" {2,}", " ", newname)
 
         # build path
