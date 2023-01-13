@@ -160,7 +160,7 @@ cython_debug/
 #.idea/
 
 # Configuration files
-#*.ini
+*.ini
 
 # test data
 testcases/
