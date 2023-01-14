@@ -122,11 +122,11 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
     Either if search mode finds a result or if an imdb ID is already present
     in the metadata information, the logic will continue in title mode.
     In this mode the actual needed information will be retrieved over the
-    imdb api.
+    imdb API.
 
-    The batch mode is optional and only needed to minimize api calls.
+    The batch mode is optional and only needed to minimize API calls.
     It's main purpose is to detect bulk renaming of series and return cached
-    information of the previous api call. To do so the arguments 'previous
+    information of the previous API call. To do so the arguments 'previous
     title', 'previous season' and 'previous response' are needed.
 
     metadata data structure:
@@ -152,7 +152,7 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
         debug (bool): enable / disable debug output
 
     Returns:
-        response (dict): api response
+        response (dict): API response
     """
     while True:
         # batch mode
