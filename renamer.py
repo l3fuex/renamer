@@ -109,7 +109,7 @@ def print_help():
 def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False):
     """Lookup imdb data for given metadata.
 
-    The lookup logic consists of three modes to minimize api calls to the
+    The lookup logic consists of three modes to minimize API calls to the
     absolute minimun. The three modes are search, title and batch mode.
 
     The main purpose of the search mode is to get an imdb ID for given
@@ -128,19 +128,18 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
     It's main purpose is to detect bulk renaming of series and return cached
     information of the previous API call. To do so the arguments 'previous
     title', 'previous season' and 'previous response' are needed.
+    Further batch mode works only on sorted data structures.
 
     metadata data structure:
     {
-      "/path/to/my/file/Alien (1979).mkv": {
-        "extension": ".mkv",
-        "filename": "Alien (1979)",
-        "dirname": "/path/to/my/file",
-        "runtime": 116,
-        "year": "1979",
-        "type": "movie",
-        "title": "Alien 1979"
-        "id": "tt0078748"
-      }
+      "extension": ".mkv",
+      "filename": "Alien (1979)",
+      "dirname": "/path/to/my/file",
+      "runtime": 116,
+      "year": "1979",
+      "type": "movie",
+      "title": "Alien 1979"
+      "id": "tt0078748"
     }
     title and type are mandatory, anything else is optional in this context
 
@@ -247,70 +246,54 @@ def select_result(response):
 
 
 def main():
-    """Renaming of movie and tv-show files.
-
-    +++ Renaming Logic +++
-    For all valid file arguments local meta data is collected which is the
-    basis for further api calls. To prevent unnecessary api calls from
-    happening three modes of operation are implemented which are search mode,
-    title mode and batch mode.
-    In search mode the logic searches for possible titles based on the parsed
-    title name (2-3 API calls).
-    In title mode the imdbID is already known (1-2 API calls).
-    And in batch mode cached data is being used (0-1 API calls).
-    """
+    """Renaming of movie and tv-show files."""
     # input processing
     options = input_validation()
 
-    # sort file arguments for further processing
-    sys.argv.sort()
-
     print("[INFO] Start processing {} file(s)".format(len(sys.argv)))
 
-    # parse files in sys.argv for related metadata
-    metadata = {}
+    # sort arguments for further processing (important for batch mode)
+    sys.argv.sort()
+
+    ptitle, pseason, response = None, None, None
     for i in sys.argv:
+        # parse files in sys.argv
         filedata = parser.file_parser(i, options["debug"])
         infodata = parser.info_parser(i, options["debug"])
-        metadata[i] = {}
-        metadata[i].update(filedata)
-        metadata[i].update(infodata)
+        metadata = {}
+        metadata.update(filedata)
+        metadata.update(infodata)
 
-    # collect data from imdb
-    ptitle, pseason, presponse = None, None, None
-    for i in metadata:
+        # collect data from imdb
         try:
-            response = imdb_lookup(metadata[i], ptitle, pseason, presponse, options["debug"])
+            response = imdb_lookup(metadata, ptitle, pseason, response, options["debug"])
+            ptitle = metadata["title"]
+            pseason = metadata.get("season")
         except ValueError as error:
             print("[ERROR] {}".format(error))
             continue
-
-        ptitle = metadata[i]["title"]
-        pseason = metadata[i].get("season")
-        presponse = response
-
-        # add imdb data to meta data
-        imdb_data = parser.dict_parser(response, ["id", "title", "year", "genres"])
-        if metadata[i]["type"] == "series":
-            episode = int(metadata[i]["episode"]) - 1
-            data = parser.dict_parser(response["episodes"][episode], ["episodeTitle"])
-            imdb_data.update(data)
-        metadata[i].update(imdb_data)
+        else:
+            imdb_data = parser.dict_parser(response, ["id", "title", "year", "genres"])
+            if metadata["type"] == "series":
+                episode = int(metadata["episode"]) - 1
+                data = parser.dict_parser(response["episodes"][episode], ["episodeTitle"])
+                imdb_data.update(data)
+            metadata.update(imdb_data)
 
         # build new filename
-        if metadata[i]["type"] == "movie":
+        if metadata["type"] == "movie":
             newname = (
-                metadata[i]["title"]
-                + " (" + metadata[i]["year"] + ")"
-                + metadata[i]["extension"]
+                metadata["title"]
+                + " (" + metadata["year"] + ")"
+                + metadata["extension"]
             )
-        if metadata[i]["type"] == "series":
+        if metadata["type"] == "series":
             newname = (
-                metadata[i]["title"]
-                + " - S" + str(metadata[i]["season"])
-                + "E" + metadata[i]["episode"]
-                + " - " + metadata[i]["episodeTitle"]
-                + metadata[i]["extension"]
+                metadata["title"]
+                + " - S" + str(metadata["season"])
+                + "E" + metadata["episode"]
+                + " - " + metadata["episodeTitle"]
+                + metadata["extension"]
             )
 
         # sanitize filename
@@ -319,13 +302,13 @@ def main():
         newname = re.sub(" {2,}", " ", newname)
 
         # build path
-        abspath = os.path.join(metadata[i]["dirname"], newname)
+        newname = os.path.join(metadata["dirname"], newname)
 
         # rename file
         try:
             if not options["simulate"]:
-                os.rename(i, abspath)
-            print('[INFO] Renaming "{}" to "{}"'.format(os.path.basename(i), os.path.basename(abspath)))
+                os.rename(i, newname)
+            print('[INFO] Renaming "{}" to "{}"'.format(os.path.basename(i), os.path.basename(newname)))
         except OSError as error:
             print("[ERROR] {}".format(error))
             continue

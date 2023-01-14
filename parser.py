@@ -4,6 +4,7 @@
 try:
     import os
     import re
+    import json
     import cv2
 except ModuleNotFoundError as error:
     print("[ERROR] {}".format(error))
@@ -87,7 +88,7 @@ def file_parser(file, debug=False):
     data["title"] = title.strip()
 
     if debug:
-        print("[DEBUG] file parser output: {}".format(data))
+        print("[DEBUG] file parser output: {}".format(json.dumps(data, indent=2)))
 
     return data
 
@@ -120,7 +121,7 @@ def info_parser(file, debug=False):
     if result and os.path.isfile(info_file):
         try:
             file_object = open(info_file, "rb")
-        except Exception as error:
+        except OSError as error:
             print("[ERROR] {}".format(error))
             return None
         else:
@@ -135,7 +136,7 @@ def info_parser(file, debug=False):
             data["id"] = result[0]
 
     if debug:
-        print("[DEBUG] info parser output: {}".format(data))
+        print("[DEBUG] info parser output: {}".format(json.dumps(data, indent=2)))
 
     return data
 
