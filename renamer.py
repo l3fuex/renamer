@@ -177,7 +177,7 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
                 response.update(data)
                 return response
         # search mode
-        else:
+        elif "year" in metadata or "runtime" in metadata:
             if debug:
                 print("[DEBUG] entering search mode")
             if metadata["type"] == "series":
