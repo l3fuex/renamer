@@ -153,7 +153,7 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
     Returns:
         response (dict): API response
     """
-    counter = 0
+    asflag = False
     while True:
         # batch mode
         if metadata["title"] == ptitle:
@@ -178,8 +178,7 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
                 response.update(data)
                 return response
         # advanced search mode
-        elif counter < 3:
-            counter += 1
+        elif asflag:
             if debug:
                 print("[DEBUG] entering advanced search mode")
             if metadata["type"] == "series":
@@ -193,7 +192,9 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
                 if "runtime" in metadata:
                     metadata.pop("runtime")
                     continue
-                continue
+                if "year" and "runtime" not in metadata:
+                    asflag = False
+                    continue
             metadata["id"] = search["results"][index]["id"]
         # basic search mode
         else:
@@ -205,7 +206,7 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
                 search = imdb.search_series(KEY, LANG, metadata["title"], debug)
             index = select_result(search)
             if index is None:
-                raise
+                raise ValueError("nothing found for title " + "\"" + metadata["title"] + "\"")
             metadata["id"] = search["results"][index]["id"]
 
 
@@ -230,11 +231,10 @@ def select_result(response):
 
     elif len(response["results"]) > 1:
         for index, result in enumerate(response["results"]):
-            print("{}: {}, {}, [{}]".format(
+            print("{}: {}, {}".format(
                 index + 1,
                 result["title"],
-                result["description"],
-                result["genres"]
+                result["description"]
                 )
             )
         while True:
