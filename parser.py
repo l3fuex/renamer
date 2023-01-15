@@ -79,7 +79,7 @@ def file_parser(file, debug=False):
     title = re.sub(r"(\(|\[)(\d\d\d\d)(\)|\])", "", title)
     title = re.sub(r"[._\-\(\)\[\]]", " ", title)
     title = re.sub(r"director['`']?s cut", "", title, flags=re.IGNORECASE)
-    title = re.sub(r"(blueray|dubbed|repack)", "", title, flags=re.IGNORECASE)
+    title = re.sub(r"(bluray|dubbed|repack)", "", title, flags=re.IGNORECASE)
     title = re.sub(r"(720|1080|2160)[p]?", "", title, flags=re.IGNORECASE)
     title = re.sub(r"x26[4,5]", "", title, flags=re.IGNORECASE)
     title = re.sub(r"[s]\d{1,2}[e]\d{1,2}.*", "", title, flags=re.IGNORECASE)

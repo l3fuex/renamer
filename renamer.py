@@ -153,6 +153,7 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
     Returns:
         response (dict): API response
     """
+    counter = 0
     while True:
         # batch mode
         if metadata["title"] == ptitle:
@@ -176,10 +177,11 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
                 data = imdb.get_episodes(KEY, LANG, metadata["id"], metadata["season"], debug)
                 response.update(data)
                 return response
-        # search mode
-        elif "year" in metadata or "runtime" in metadata:
+        # advanced search mode
+        elif counter < 3:
+            counter += 1
             if debug:
-                print("[DEBUG] entering search mode")
+                print("[DEBUG] entering advanced search mode")
             if metadata["type"] == "series":
                 metadata.pop("runtime", None)
             search = imdb.advanced_search(KEY, metadata["type"], metadata["title"], metadata.get("year"), metadata.get("runtime"), debug)
@@ -191,8 +193,19 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
                 if "runtime" in metadata:
                     metadata.pop("runtime")
                     continue
-                if "year" not in metadata and "runtime" not in metadata:
-                    raise ValueError("nothing found for title " + "\"" + metadata["title"] + "\"")
+                continue
+            metadata["id"] = search["results"][index]["id"]
+        # basic search mode
+        else:
+            if debug:
+                print("[DEBUG] entering basic search mode")
+            if metadata["type"] == "movie":
+                search = imdb.search_movie(KEY, LANG, metadata["title"], debug)
+            if metadata["type"] == "series":
+                search = imdb.search_series(KEY, LANG, metadata["title"], debug)
+            index = select_result(search)
+            if index is None:
+                raise
             metadata["id"] = search["results"][index]["id"]
 
 
