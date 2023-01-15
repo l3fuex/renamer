@@ -175,8 +175,8 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
                 return response
             if data["type"] == "series":
                 response = imdb.get_title(KEY, LANG, data["id"], debug)
-                data = imdb.get_episodes(KEY, LANG, data["id"], data["season"], debug)
-                response.update(data)
+                tmp = imdb.get_episodes(KEY, LANG, data["id"], data["season"], debug)
+                response.update(tmp)
                 return response
         # advanced search mode
         elif asflag:
