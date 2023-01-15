@@ -153,62 +153,41 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
     Returns:
         response (dict): API response
     """
-    data = metadata.copy()
-    asflag = True
     while True:
         # batch mode
-        if data["title"] == ptitle:
+        if metadata["title"] == ptitle:
             if debug:
                 print("[DEBUG] entering batch mode")
-            if data["type"] == "series" and data["season"] == pseason:
+            if metadata["type"] == "series" and metadata["season"] == pseason:
                 return presponse
-            if data["type"] == "series" and data["season"] != pseason:
-                tmp = imdb.get_episodes(KEY, LANG, presponse["id"], data["season"], debug)
-                presponse.update(tmp)
+            if metadata["type"] == "series" and metadata["season"] != pseason:
+                data = imdb.get_episodes(KEY, LANG, presponse["id"], metadata["season"], debug)
+                presponse.update(data)
                 return presponse
         # title mode
-        elif "id" in data:
+        elif "id" in metadata:
             if debug:
                 print("[DEBUG] entering title mode")
-            if data["type"] == "movie":
-                response = imdb.get_title(KEY, LANG, data["id"], debug)
+            if metadata["type"] == "movie":
+                response = imdb.get_title(KEY, LANG, metadata["id"], debug)
                 return response
-            if data["type"] == "series":
-                response = imdb.get_title(KEY, LANG, data["id"], debug)
-                data = imdb.get_episodes(KEY, LANG, data["id"], data["season"], debug)
+            if metadata["type"] == "series":
+                response = imdb.get_title(KEY, LANG, metadata["id"], debug)
+                data = imdb.get_episodes(KEY, LANG, metadata["id"], metadata["season"], debug)
                 response.update(data)
                 return response
-        # advanced search mode
-        elif asflag:
-            if debug:
-                print("[DEBUG] entering advanced search mode")
-            if data["type"] == "series":
-                data.pop("runtime", None)
-            search = imdb.advanced_search(KEY, data["type"], data["title"], data.get("year"), data.get("runtime"), debug)
-            index = select_result(search)
-            if index is None:
-                if "year" in data:
-                    data.pop("year")
-                    continue
-                if "runtime" in data:
-                    data.pop("runtime")
-                    continue
-                if "year" and "runtime" not in data:
-                    asflag = False
-                    continue
-            data["id"] = search["results"][index]["id"]
-        # basic search mode
+        # search mode
         else:
             if debug:
-                print("[DEBUG] entering basic search mode")
-            if data["type"] == "movie":
-                search = imdb.search_movie(KEY, LANG, data["title"], debug)
-            if data["type"] == "series":
-                search = imdb.search_series(KEY, LANG, data["title"], debug)
+                print("[DEBUG] entering search mode")
+            if metadata["type"] == "movie":
+                search = imdb.search_movie(KEY, LANG, metadata["title"], debug)
+            if metadata["type"] == "series":
+                search = imdb.search_series(KEY, LANG, metadata["title"], debug)
             index = select_result(search, metadata.get("year"))
             if index is None:
-                raise ValueError("nothing found for title " + "\"" + data["title"] + "\"")
-            data["id"] = search["results"][index]["id"]
+                raise ValueError("nothing found for title " + "\"" + metadata["title"] + "\"")
+            metadata["id"] = search["results"][index]["id"]
 
 
 def select_result(response, year=None):

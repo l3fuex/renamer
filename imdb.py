@@ -75,7 +75,7 @@ def search_series(key, lang, series_title, debug=False):
     return api_call(url)
 
 
-def advanced_search(key, media_type, title, year, runtime, debug=False):
+#def advanced_search(key, media_type, title, year, runtime, debug=False):
     """Builds the AdvancedSearch API call.
     Args:
         key (str): API key
@@ -87,6 +87,7 @@ def advanced_search(key, media_type, title, year, runtime, debug=False):
 
     Returns:
         api_call (dict): API response
+    """
     """
     check_key(key)
     # build api call
@@ -108,7 +109,7 @@ def advanced_search(key, media_type, title, year, runtime, debug=False):
     if debug:
         print("[DEBUG] sending api call {}".format(url))
     return api_call(url)
-
+    """
 
 def get_title(key, lang, imdb_id, debug=False):
     """Builds the Title API call.
