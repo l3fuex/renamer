@@ -101,7 +101,7 @@ def print_help():
     print("    renamer [options] [file]")
     print("")
     print("Options:")
-    print("    -s, --simulate   no action")
+    print("    -s, --simulate   no renaming")
     print("    -v, --verbose    verbose output")
     print("    -o, --offset     define offset for episode renaming")
     print("    -h, --help       show this message")
