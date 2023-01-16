@@ -75,6 +75,41 @@ def search_series(key, lang, series_title, debug=False):
     return api_call(url)
 
 
+def advanced_search(key, media_type, title, year, runtime, debug=False):
+    """Builds the AdvancedSearch API call.
+    Args:
+        key (str): API key
+        media_type (str): movie or series
+        title (str): media title
+        year (str): release date
+        runtime (int): runtime in minutes
+        debug (bool): enable / disbale debug output
+
+    Returns:
+        api_call (dict): API response
+    """
+    check_key(key)
+    # build api call
+    if media_type == "movie":
+        string = "&title_type=feature,tv_movie,video"
+    if media_type == "series":
+        string = "&title_type=tv_series,tv_miniseries"
+    if year is not None:
+        string += "&release_date=" + str(year) + "-01-01," + str(year) + "-12-31"
+    if runtime is not None:
+        string += "&runtime=" + str(runtime-5) + "," + str(runtime+5)
+    url = (
+        BASE_URL + "/" +
+        "API/AdvancedSearch" + "/" +
+        key + "?" +
+        "title=" + title +
+        string
+    )
+    if debug:
+        print("[DEBUG] sending api call {}".format(url))
+    return api_call(url)
+
+
 def get_title(key, lang, imdb_id, debug=False):
     """Builds the Title API call.
 
