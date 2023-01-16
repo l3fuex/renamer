@@ -208,15 +208,15 @@ def select_result(response, year=None):
     """
     if len(response["results"]) == 1:
         return 0
-    elif len(response["results"]) > 1 and year is not None:
-        count = 0
-        for i, v in enumerate(response["results"]):
-            if re.match(year, v["description"]):
-                index = i
-                count += 1
-        if count == 1:
-            return index
     elif len(response["results"]) > 1:
+        if year is not None:
+            count = 0
+            for i, v in enumerate(response["results"]):
+                if re.match(year, v["description"]):
+                    index = i
+                    count += 1
+            if count == 1:
+                return index
         for i, v in enumerate(response["results"]):
             print("{}: {}, {}".format(
                 i + 1,
