@@ -227,9 +227,17 @@ def select_result(response, year=None):
     Returns:
         index (int): corresponding index value
     """
+    # no match
+    if len(response["results"]) == 0:
+        return None
+
+    # exact match
     if len(response["results"]) == 1:
         return 0
-    elif len(response["results"]) > 1:
+
+    # multiple matches
+    if len(response["results"]) > 1:
+        # try to automatically select result based on year
         if year is not None:
             count = 0
             for i, v in enumerate(response["results"]):
@@ -238,6 +246,7 @@ def select_result(response, year=None):
                     count += 1
             if count == 1:
                 return index
+        # if no automatic selection is possible aks user to make a choice
         for i, v in enumerate(response["results"]):
             print("{}: {}, {}".format(
                 i + 1,
@@ -258,8 +267,6 @@ def select_result(response, year=None):
                 print("choose a number between 1 and {}".format(len(response["results"])))
                 continue
             return index-1
-    else:
-        return None
 
 
 def main():
