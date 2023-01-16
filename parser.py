@@ -62,8 +62,8 @@ def file_parser(file, debug=False):
     if data["type"] == "series":
         pattern = r"(^.*)(?:[sS])(\d{1,2})(?:[eE])(\d{1,2})(?:.*)"
         result = re.match(pattern, abspath)
-        data["season"] = result.group(2)
-        data["episode"] = result.group(3)
+        data["season"] = result.group(2).zfill(2)
+        data["episode"] = result.group(3).zfill(2)
 
     # extract title
     if data["type"] == "series":

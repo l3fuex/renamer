@@ -5,6 +5,7 @@ try:
     import sys
     import os
     import re
+    import json
     import configparser
     import parser
     import imdb
@@ -53,6 +54,14 @@ def input_validation():
             elif sys.argv[index] == "-v" or sys.argv[index] == "--verbose":
                 options["debug"] = True
                 sys.argv.remove(sys.argv[index])
+            elif sys.argv[index] == "-o" or sys.argv[index] == "--offset":
+                try:
+                    options["offset"] = int(sys.argv[index+1])
+                except ValueError as error:
+                    print("[ERROR] Please specify a valid offset value")
+                    raise SystemExit from None
+                sys.argv.remove(sys.argv[index+1])
+                sys.argv.remove(sys.argv[index])
             elif sys.argv[index] == "-h" or sys.argv[index] == "--help":
                 print_help()
                 raise SystemExit from None
@@ -89,15 +98,13 @@ def input_validation():
 def print_help():
     """Prints out a general help page about how to use the program."""
     print("Usage:")
-    print("    renamer [ -s ] [ -v ] [ -h ] [ file 1 ] [ file 2 ] [ file n ]")
+    print("    renamer [options] [file]")
     print("")
-    print("Arguments:")
-    print("    -s, --simulate")
-    print("            no action")
-    print("    -v, --verbose")
-    print("            verbose output")
-    print("    -h, --help ")
-    print("            help page")
+    print("Options:")
+    print("    -s, --simulate   no action")
+    print("    -v, --verbose    verbose output")
+    print("    -o, --offset     define offset for episode renaming")
+    print("    -h, --help       show this message")
     print("")
     print("Examples:")
     print("    ./renamer Alien.mkv")
@@ -287,6 +294,12 @@ def main():
         metadata = {}
         metadata.update(filedata)
         metadata.update(infodata)
+
+        # apply offset to episode value
+        if "offset" in options:
+            metadata["episode"] = int(metadata["episode"]) + options["offset"]
+            metadata["episode"] = str(metadata["episode"])
+            metadata["episode"] = metadata["episode"].zfill(2)
 
         # collect data from imdb
         try:
