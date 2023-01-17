@@ -5,7 +5,6 @@ try:
     import sys
     import os
     import re
-    import json
     import configparser
     import parser
     import imdb
@@ -33,7 +32,7 @@ def input_validation():
         options (dict): options in key value format
     """
     # define default options and valid file extensions
-    options = {"debug": False, "simulate": False}
+    options = {"debug": False, "simulate": False, "offset": 0}
     extensions = [".avi", ".mkv", ".mov", ".mp4", ".wmv"]
 
     # remove program call from arguments
@@ -57,7 +56,7 @@ def input_validation():
             elif sys.argv[index] == "-o" or sys.argv[index] == "--offset":
                 try:
                     options["offset"] = int(sys.argv[index+1])
-                except ValueError as error:
+                except ValueError:
                     print("[ERROR] Please specify a valid offset value")
                     raise SystemExit from None
                 sys.argv.remove(sys.argv[index+1])
@@ -295,12 +294,6 @@ def main():
         metadata.update(filedata)
         metadata.update(infodata)
 
-        # apply offset to episode value
-        if "offset" in options:
-            metadata["episode"] = int(metadata["episode"]) + options["offset"]
-            metadata["episode"] = str(metadata["episode"])
-            metadata["episode"] = metadata["episode"].zfill(2)
-
         # collect data from imdb
         try:
             response = imdb_lookup(metadata, ptitle, pseason, response, options["debug"])
@@ -309,13 +302,19 @@ def main():
         except ValueError as error:
             print("[ERROR] {}".format(error))
             continue
-        else:
-            imdb_data = parser.dict_parser(response, ["id", "title", "year", "genres"])
-            if metadata["type"] == "series":
-                episode = int(metadata["episode"]) - 1
-                data = parser.dict_parser(response["episodes"][episode], ["episodeTitle"])
-                imdb_data.update(data)
-            metadata.update(imdb_data)
+
+        # write specific keys from response into metadata
+        imdb_data = parser.dict_parser(response, ["id", "title", "year", "genres"])
+        if metadata["type"] == "series":
+            # apply and check offset
+            metadata["episode"] = str(int(metadata["episode"]) + options["offset"]).zfill(2)
+            episode = int(metadata["episode"])
+            if episode < 1 or episode > len(response["episodes"]):
+                print("[ERROR] offset out of range")
+                continue
+            data = parser.dict_parser(response["episodes"][episode-1], ["episodeTitle"])
+            imdb_data.update(data)
+        metadata.update(imdb_data)
 
         # build new filename
         if metadata["type"] == "movie":
