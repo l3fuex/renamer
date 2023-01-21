@@ -10,7 +10,14 @@ One design consideration was to make as less as possible API calls but also keep
 1. `git clone git@github.com:l3fuex/renamer.git`
 2. `cd renamer`
 3. `pip3 install -r requirements.txt`
-4. `ln -s /absolute/path/to/renamer.py /usr/local/bin/renamer`
+4. `mv config.ini.example config.ini`
+5. Get yourself an API key from https://imdb-api.com/ by registering an account and instert the key in the config.ini file
+```
+[IMDB]
+language: EN
+apikey: insertapikeyhere
+```
+6. `ln -s /absolute/path/to/renamer.py /usr/local/bin/renamer`
 
 # Usage
 ```
