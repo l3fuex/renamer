@@ -15,7 +15,7 @@ One design consideration was to make as less as possible API calls but also keep
 ```
 [IMDB]
 language: EN
-apikey: insertapikeyhere
+apikey: <insert_api_key_here>
 ```
 6. `ln -s /absolute/path/to/renamer.py /usr/local/bin/renamer`
 
