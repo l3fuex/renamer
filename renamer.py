@@ -32,7 +32,7 @@ def input_validation():
         options (dict): options in key value format
     """
     # define default options and valid file extensions
-    options = {"debug": False, "simulate": False, "offset": 0}
+    options = {"asflag": True, "bsflag": True, "simulate": False, "debug": False, "offset": 0}
     extensions = [".avi", ".mkv", ".mov", ".mp4", ".wmv"]
 
     # remove program call from arguments
@@ -43,32 +43,40 @@ def input_validation():
         print_help()
         raise SystemExit from None
 
-    # validation of options arguments
-    index = 0
-    while index < len(sys.argv):
-        if re.match("^-.*", sys.argv[index]):
-            if sys.argv[index] == "-s" or sys.argv[index] == "--simulate":
+    # validation of option arguments
+    i = 0
+    while i < len(sys.argv):
+        if re.match("^-.*", sys.argv[i]):
+            if sys.argv[i] == "-a" or sys.argv[i] == "--advanced-search":
+                options["asflag"] = True
+                options["bsflag"] = False
+                sys.argv.remove(sys.argv[i])
+            elif sys.argv[i] == "-b" or sys.argv[i] == "--basic-search":
+                options["asflag"] = False
+                options["bsfalg"] = True
+                sys.argv.remove(sys.argv[i])
+            elif sys.argv[i] == "-s" or sys.argv[i] == "--simulate":
                 options["simulate"] = True
-                sys.argv.remove(sys.argv[index])
-            elif sys.argv[index] == "-v" or sys.argv[index] == "--verbose":
+                sys.argv.remove(sys.argv[i])
+            elif sys.argv[i] == "-v" or sys.argv[i] == "--verbose":
                 options["debug"] = True
-                sys.argv.remove(sys.argv[index])
-            elif sys.argv[index] == "-o" or sys.argv[index] == "--offset":
+                sys.argv.remove(sys.argv[i])
+            elif sys.argv[i] == "-o" or sys.argv[i] == "--offset":
                 try:
-                    options["offset"] = int(sys.argv[index+1])
+                    options["offset"] = int(sys.argv[i+1])
                 except ValueError:
                     print("[ERROR] Please specify a valid offset value")
                     raise SystemExit from None
-                sys.argv.remove(sys.argv[index+1])
-                sys.argv.remove(sys.argv[index])
-            elif sys.argv[index] == "-h" or sys.argv[index] == "--help":
+                sys.argv.remove(sys.argv[i+1])
+                sys.argv.remove(sys.argv[i])
+            elif sys.argv[i] == "-h" or sys.argv[i] == "--help":
                 print_help()
                 raise SystemExit from None
             else:
                 print("[ERROR] One or more arguments are not supported")
                 raise SystemExit from None
         else:
-            index += 1
+            i += 1
 
     # print error if no file is specified
     if not sys.argv:
@@ -76,16 +84,16 @@ def input_validation():
         raise SystemExit from None
 
     # validation of file arguments
-    index = 0
-    while index < len(sys.argv):
-        if not os.path.isfile(sys.argv[index]):
-            print(f'[ERROR] File "{sys.argv[index]}" not found')
-            sys.argv.remove(sys.argv[index])
-        elif not os.path.splitext(sys.argv[index])[1] in extensions:
-            print(f'[ERROR] File "{sys.argv[index]}" is not a media file')
-            sys.argv.remove(sys.argv[index])
+    i = 0
+    while i < len(sys.argv):
+        if not os.path.isfile(sys.argv[i]):
+            print(f'[ERROR] File "{sys.argv[i]}" not found')
+            sys.argv.remove(sys.argv[i])
+        elif not os.path.splitext(sys.argv[i])[1] in extensions:
+            print(f'[ERROR] File "{sys.argv[i]}" is not a media file')
+            sys.argv.remove(sys.argv[i])
         else:
-            index += 1
+            i += 1
 
     # raise SystemExit if there are no valid file arguments
     if not sys.argv:
@@ -95,46 +103,49 @@ def input_validation():
 
 
 def print_help():
-    """Prints out a general help page about how to use the program."""
+    """Prints out a general help page."""
     print("Usage:")
     print("    renamer [options] [file]")
     print("")
     print("Options:")
-    print("    -s, --simulate   no renaming")
-    print("    -v, --verbose    verbose output")
-    print("    -o, --offset     define offset for episode renaming")
-    print("    -h, --help       show this message")
+    print("    -a, --advanced-search  enable only advanced search mode")
+    print("    -b, --basic-search     enable only basic search mode")
+    print("    -h, --help             show this message")
+    print("    -o, --offset           define offset for episode renaming")
+    print("    -s, --simulate         no renaming")
+    print("    -v, --verbose          verbose output")
     print("")
     print("Examples:")
     print("    ./renamer Alien.mkv")
-    print("    ./renamer Alien.mkv Predator.mkv")
-    print("    ./renamer Futurama*.mkv")
-    print("    ./renamer Futurama/Season\\ {01..03}/*.mkv")
+    print("    ./renamer -s Futurama/Season\\ {01..03}/*.mkv")
+    print("    ./renamer -o -1 futurama_S01E03_somename.mkv")
 
 
-def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False):
+def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, asflag=True, bsflag=True, debug=False):
     """Lookup imdb data for given metadata.
 
-    The lookup logic consists of three modes to minimize API calls to the
-    absolute minimun. The three modes are search, title and batch mode.
+    The lookup logic consists of four modes (advanced search mode,
+    basic search mode, title mode and batch mode).
 
-    The main purpose of the search mode is to get an imdb ID for given
-    metadata information. Starting with the most specific search request
+    The main purpose of the advanced search mode is to get an imdb ID for
+    given metadata information. Starting with the most specific search request
     leading to less specific requests the mode can be called up to three
-    times. The purpose of this behaviour is to minimize user interactions.
-    If there is no search result after the last iteration an error will be
-    raised.
+    times. The purpose of this is to strive to get exact one search result to
+    minimize user interactions.
 
-    Either if search mode finds a result or if an imdb ID is already present
-    in the metadata information, the logic will continue in title mode.
-    In this mode the actual needed information will be retrieved over the
-    imdb API.
+    If no result was found in advanced search mode the logic falls back to
+    basic search mode.
+
+    Either if one of the two search modes finds a result or if an imdb ID is
+    already present in the metadata information, the logic will continue in
+    title mode. In this mode the actual needed information will be retrieved
+    over the imdb API.
 
     The batch mode is optional and only needed to minimize API calls.
     It's main purpose is to detect bulk renaming of series and return cached
     information of the previous API call. To do so the arguments 'previous
     title', 'previous season' and 'previous response' are needed.
-    Further batch mode works only on sorted data structures.
+    Further, batch mode works only on sorted data structures.
 
     metadata data structure:
     {
@@ -147,20 +158,22 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
       "title": "Alien 1979"
       "id": "tt0078748"
     }
-    title and type are mandatory, anything else is optional in this context
+    "title" and "type" are mandatory, anything else is optional in this
+    context.
 
-    Args;
+    Args:
         metadata (dict): dictionary containing metadata information
         ptitle (str): previous title needed for batch mode
         pseason (str): previous season needed for batch mode
         presponse (dict): previous response needed for batch mode
+        asflag (bool): enable / disable advanced search
+        bsflag (bool): enable / disable basic search
         debug (bool): enable / disable debug output
 
     Returns:
         response (dict): API response
     """
     data = metadata.copy()
-    asflag = True
     while True:
         # batch mode
         if data["title"] == ptitle:
@@ -199,12 +212,14 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
                 if "runtime" in data:
                     data.pop("runtime")
                     continue
-                if "year" and "runtime" not in data:
+                if "year" and "runtime" not in data and bsflag:
                     asflag = False
                     continue
+                if "year" and "runtime" not in data and not bsflag:
+                    raise ValueError("nothing found for title " + "\"" + data["title"] + "\"")
             data["id"] = search["results"][index]["id"]
         # basic search mode
-        else:
+        elif bsflag:
             if debug:
                 print("[DEBUG] entering basic search mode")
             if data["type"] == "movie":
@@ -218,25 +233,22 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, debug=False
 
 
 def select_result(response, year=None):
-    """Select the correct result from an imdb search request and get
-    the corresponding index value.
+    """Select the correct result from an imdb search request.
 
     If there is only one entry in the given search response the index value
     will be set to 0 and the processing ends. If there are more than one
-    entries in the search response the user is asked to make a choice.
-    The corresponding index value will then be returned.
-    Any other condition will return 'None' as index value.
+    entries in the search response the logic tries to automatically choose
+    the correct result based on the "year". If this is not possible the user
+    is asked to make a choice. The corresponding index value will be returned.
+    Any other condition will return 'None'.
 
     Args:
-        response (dict): imdb-api search response
+        response (dict): search response
+        year (str): year of release
 
     Returns:
         index (int): corresponding index value
     """
-    # no match
-    if len(response["results"]) == 0:
-        return None
-
     # exact match
     if len(response["results"]) == 1:
         return 0
@@ -274,17 +286,20 @@ def select_result(response, year=None):
                 continue
             return index-1
 
+    # no match
+    return None
+
 
 def main():
     """Renaming of movie and tv-show files."""
-    # input processing
+    # input validation
     options = input_validation()
-
-    print("[INFO] Start processing {} file(s)".format(len(sys.argv)))
 
     # sort arguments for further processing (important for batch mode)
     sys.argv.sort()
 
+    # process files
+    print("[INFO] Start processing {} file(s)".format(len(sys.argv)))
     ptitle, pseason, response = None, None, None
     for i in sys.argv:
         # parse files in sys.argv
@@ -296,25 +311,24 @@ def main():
 
         # collect data from imdb
         try:
-            response = imdb_lookup(metadata, ptitle, pseason, response, options["debug"])
+            response = imdb_lookup(metadata, ptitle, pseason, response, options["asflag"], options["bsflag"], options["debug"])
             ptitle = metadata["title"]
             pseason = metadata.get("season")
         except ValueError as error:
             print("[ERROR] {}".format(error))
             continue
-
-        # write specific keys from response into metadata
-        imdb_data = parser.dict_parser(response, ["id", "title", "year", "genres"])
-        if metadata["type"] == "series":
-            # apply and check offset
-            metadata["episode"] = str(int(metadata["episode"]) + options["offset"]).zfill(2)
-            episode = int(metadata["episode"])
-            if episode < 1 or episode > len(response["episodes"]):
-                print("[ERROR] offset out of range")
-                continue
-            data = parser.dict_parser(response["episodes"][episode-1], ["episodeTitle"])
-            imdb_data.update(data)
-        metadata.update(imdb_data)
+        else:
+            imdb_data = parser.dict_parser(response, ["id", "title", "year", "genres"])
+            if metadata["type"] == "series":
+                # apply and check offset
+                metadata["episode"] = str(int(metadata["episode"]) + options["offset"]).zfill(2)
+                episode = int(metadata["episode"])
+                if episode < 1 or episode > len(response["episodes"]):
+                    print("[ERROR] offset out of range")
+                    continue
+                data = parser.dict_parser(response["episodes"][episode-1], ["episodeTitle"])
+                imdb_data.update(data)
+            metadata.update(imdb_data)
 
         # build new filename
         if metadata["type"] == "movie":
@@ -326,7 +340,7 @@ def main():
         if metadata["type"] == "series":
             newname = (
                 metadata["title"]
-                + " - S" + str(metadata["season"])
+                + " - S" + metadata["season"]
                 + "E" + metadata["episode"]
                 + " - " + metadata["episodeTitle"]
                 + metadata["extension"]
