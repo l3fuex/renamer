@@ -205,19 +205,15 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, asflag=True
                 data.pop("runtime", None)
             search = imdb.advanced_search(KEY, data["type"], data["title"], data.get("year"), data.get("runtime"), debug)
             index = select_result(search)
-            if index is None:
-                if "year" in data:
-                    data.pop("year")
-                    continue
-                if "runtime" in data:
-                    data.pop("runtime")
-                    continue
-                if "year" and "runtime" not in data and bsflag:
-                    asflag = False
-                    continue
-                if "year" and "runtime" not in data and not bsflag:
-                    raise ValueError("nothing found for title " + "\"" + data["title"] + "\"")
-            data["id"] = search["results"][index]["id"]
+            if index is not None:
+                data["id"] = search["results"][index]["id"]
+            elif "runtime" in data:
+                data.pop("runtime")
+            elif "year" in data and bsflag:
+                data.pop("year")
+                asflag = False
+            elif "year" not in data and not bsflag:
+                raise ValueError("nothing found for title " + "\"" + data["title"] + "\"")
         # basic search mode
         elif bsflag:
             if debug:
