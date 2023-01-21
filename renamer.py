@@ -116,9 +116,9 @@ def print_help():
     print("    -v, --verbose          verbose output")
     print("")
     print("Examples:")
-    print("    ./renamer Alien.mkv")
-    print("    ./renamer -s Futurama/Season\\ {01..03}/*.mkv")
-    print("    ./renamer -o -1 futurama_S01E03_somename.mkv")
+    print("    renamer Alien.mkv")
+    print("    renamer -s Futurama/Season\\ {01..03}/*.mkv")
+    print("    renamer -o -1 futurama_S01E03_somename.mkv")
 
 
 def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, asflag=True, bsflag=True, debug=False):
