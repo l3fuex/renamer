@@ -33,7 +33,7 @@ Options:
     -v, --verbose          verbose output
 
 Examples:
-    ./renamer Alien.mkv
-    ./renamer -s Futurama/Season\ {01..03}/*.mkv
-    ./renamer -o -1 futurama_S01E03_somename.mkv
+    renamer Alien.mkv
+    renamer -s Futurama/Season\ {01..03}/*.mkv
+    renamer -o -1 futurama_S01E03_somename.mkv
 ```
