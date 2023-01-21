@@ -128,13 +128,8 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, asflag=True
     basic search mode, title mode and batch mode).
 
     The main purpose of the advanced search mode is to get an imdb ID for
-    given metadata information. Starting with the most specific search request
-    leading to less specific requests the mode can be called up to three
-    times. The purpose of this is to strive to get exact one search result to
-    minimize user interactions.
-
-    If no result was found in advanced search mode the logic falls back to
-    basic search mode.
+    given metadata information. If no result was found in advanced search
+    mode the logic falls back to basic search mode.
 
     Either if one of the two search modes finds a result or if an imdb ID is
     already present in the metadata information, the logic will continue in
@@ -181,7 +176,7 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, asflag=True
                 print("[DEBUG] entering batch mode")
             if data["type"] == "series" and data["season"] == pseason:
                 return presponse
-            elif data["type"] == "series" and data["season"] != pseason:
+            if data["type"] == "series" and data["season"] != pseason:
                 tmp = imdb.get_episodes(KEY, LANG, presponse["id"], data["season"], debug)
                 presponse.update(tmp)
                 return presponse
@@ -192,7 +187,7 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, asflag=True
             if data["type"] == "movie":
                 response = imdb.get_title(KEY, LANG, data["id"], debug)
                 return response
-            elif data["type"] == "series":
+            if data["type"] == "series":
                 response = imdb.get_title(KEY, LANG, data["id"], debug)
                 tmp = imdb.get_episodes(KEY, LANG, data["id"], data["season"], debug)
                 response.update(tmp)
@@ -217,7 +212,7 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, asflag=True
                 print("[DEBUG] entering basic search mode")
             if data["type"] == "movie":
                 search = imdb.search_movie(KEY, LANG, data["title"], debug)
-            elif data["type"] == "series":
+            if data["type"] == "series":
                 search = imdb.search_series(KEY, LANG, data["title"], debug)
             index = select_result(search, metadata.get("year"))
             if index is not None:
@@ -258,7 +253,7 @@ def select_result(response, year=None):
                     count += 1
             if count == 1:
                 return index
-        # if no automatic selection is possible aks user to make a choice
+        # if no automatic selection is possible ask user to make a choice
         for i, v in enumerate(response["results"]):
             print("{}: {}, {}".format(
                 i + 1,
