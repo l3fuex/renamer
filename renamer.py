@@ -181,7 +181,7 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, asflag=True
                 print("[DEBUG] entering batch mode")
             if data["type"] == "series" and data["season"] == pseason:
                 return presponse
-            if data["type"] == "series" and data["season"] != pseason:
+            elif data["type"] == "series" and data["season"] != pseason:
                 tmp = imdb.get_episodes(KEY, LANG, presponse["id"], data["season"], debug)
                 presponse.update(tmp)
                 return presponse
@@ -192,7 +192,7 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, asflag=True
             if data["type"] == "movie":
                 response = imdb.get_title(KEY, LANG, data["id"], debug)
                 return response
-            if data["type"] == "series":
+            elif data["type"] == "series":
                 response = imdb.get_title(KEY, LANG, data["id"], debug)
                 tmp = imdb.get_episodes(KEY, LANG, data["id"], data["season"], debug)
                 response.update(tmp)
@@ -207,12 +207,9 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, asflag=True
             index = select_result(search)
             if index is not None:
                 data["id"] = search["results"][index]["id"]
-            elif "runtime" in data:
-                data.pop("runtime")
-            elif "year" in data and bsflag:
-                data.pop("year")
+            elif bsflag:
                 asflag = False
-            elif "year" not in data and not bsflag:
+            else:
                 raise ValueError("nothing found for title " + "\"" + data["title"] + "\"")
         # basic search mode
         elif bsflag:
@@ -220,12 +217,13 @@ def imdb_lookup(metadata, ptitle=None, pseason=None, presponse=None, asflag=True
                 print("[DEBUG] entering basic search mode")
             if data["type"] == "movie":
                 search = imdb.search_movie(KEY, LANG, data["title"], debug)
-            if data["type"] == "series":
+            elif data["type"] == "series":
                 search = imdb.search_series(KEY, LANG, data["title"], debug)
             index = select_result(search, metadata.get("year"))
-            if index is None:
+            if index is not None:
+                data["id"] = search["results"][index]["id"]
+            else:
                 raise ValueError("nothing found for title " + "\"" + data["title"] + "\"")
-            data["id"] = search["results"][index]["id"]
 
 
 def select_result(response, year=None):
