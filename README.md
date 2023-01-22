@@ -1,8 +1,7 @@
 # General
 The program is intendend to rename movie and tv-show files based on a free API which can be found under https://imdb-api.com/.
 
-Before I started this I searched for similar software but could not find anything that satisfied my needs of simplicity and simultaneously is in my budget scope of free software. Therefore I decided to do it by myself ("how hard can it be?") and make a learning experience out of it with the intention to get deeper into python and git.  
-I am aware that there are similar API implementations available via pip. But I wanted to do it by myself - so do not wonder if these are not used in this project.
+Before I started this I searched for similar software but could not find anything that satisfied my needs of simplicity and simultaneously is in my budget scope of free software. Therefore I decided to do it by myself ("how hard can it be?") and make a learning experience out of it with the intention to get deeper into python and git. I am aware that there are similar API implementations available via pip. But I wanted to do it by myself - so do not wonder if these are not used in this project.
 
 There where two main design considerations when I wrote this piece of software:  
 
