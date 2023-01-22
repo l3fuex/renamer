@@ -1,29 +1,46 @@
 # General
 The program is intendend to rename movie and tv-show files based on a free API which can be found under https://imdb-api.com/.
 
-Before I started this I searched for similar software but could not find anything that satisfied my needs of simplicity and simultaneously is in my budget scope of open source software. Therefore I decided to do it by myself "how hard can it be??" and make a learning experience out of it with the intention to get deeper into python and git. I am aware that there are similar API implementations available via pip. But I wanted to do it by myself - so do not wonder if these are not used in this project.
+Before I started this I searched for similar software but could not find anything that satisfied my needs of simplicity and simultaneously is in my budget scope of free software. Therefore I decided to do it by myself ("how hard can it be?") and make a learning experience out of it with the intention to get deeper into python and git.  
+I am aware that there are similar API implementations available via pip. But I wanted to do it by myself - so do not wonder if these are not used in this project.
 
-One design consideration was to make as less as possible API calls but also keep user interatcions at an absolute minimum. To achieve that the software tries to make precise search requests with as much information as possible with the intention to get exactly one match (advanced search). If this does not result in a match the logic tries to make a broader search (basic search). Doing so the possibility to get more than one match is very likely. To minimize user interactions with basic search the software tries to make the decision based on parsed metadata. If this is not possible and there are still more than one options to choose from the user needs to make a choice. Also for batch renaming of whole tv-shows API responses are cached to minimize API interations.
+There where two main design considerations when I wrote this piece of software:  
+
+1. Make as less as possilbe API calls due to the fact that a free account can only do 100 API calls per day.
+2. Minimize user interactions to an absolute minimum and try to make automatic descisions whenever possible.
+
+To achieve that the software tries to make precise search requests with as much information as possible with the intention to get exactly one match (advanced search). If this does not result in a match the logic tries to make a broader search (basic search). Doing so the possibility to get more than one match is very likely. To minimize user interactions with basic search the software tries to make the decision based on parsed metadata. If this is not possible and there are still more than one options to choose from than this is the point where the user needs to make a choice. Further, when operating in batch mode (e.g. renaming a whole tv-show season or even several seasons), API responses are being cached to minimize API interactions.
+
+# Prerequirements
+
++ python3
++ pip3
++ git *(optional)*  
+
+For the software to run python3 has to be installed on your machine. pip3 is needed to install some required python modules. Finally git is needed to actually download the program. Alternatively you can just download the .zip file from github in your browser.
 
 # Installation
-## Linux
-1. `git clone git@github.com:l3fuex/renamer.git`
-2. `cd renamer`
-3. `pip3 install -r requirements.txt`
-4. `mv config.ini.example config.ini`
-5. Get an API key from https://imdb-api.com/ by registering an account.
-6. Paste the API key in the config.ini file in line 3 (see below).
-```
-[IMDB]
-language: EN
-apikey: <insert_api_key_here>
-```
-6. `ln -s /absolute/path/to/renamer.py /usr/local/bin/renamer`
+> Get an API key from https://imdb-api.com/ by setting up a free account and replace the pattern <INSERT_API_KEY_HERE> in the Configuration step with your API key.
 
-After installation you can call the program just by typing `renamer`. You should see a general help page about how to use the program. If it does not work make sure /usr/local/bin is in your $PATH environment variable (to check that type `echo $PATH`).
+## Linux
++ Download  
+`git clone https://github.com/l3fuex/renamer.git && cd renamer`
++ Install required python modules  
+`pip3 install -r requirements.txt`
++ Insert API key into configuration file  
+`mv config.ini.example config.ini && sed '3 s/$/<INSERT_API_KEY_HERE>/' config.ini`
++ Create symbolic link to make program available across the system  
+`ln -s /ABSOLUTE/PATH/TO/renamer.py /usr/local/bin/renamer`
+
+After installation you should be able to call the program from anywhere in your system by typing `renamer`. You should see a general help page about how to use the program. If it does not work make sure /usr/local/bin is in your $PATH environment variable.
 
 # Usage
-
+Supported filetypes are:
++ avi
++ mkv
++ mov
++ mp4
++ wmv
 ```
 Usage:
     renamer [options] [file]
