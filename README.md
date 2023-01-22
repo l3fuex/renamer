@@ -11,7 +11,8 @@ One design consideration was to make as less as possible API calls but also keep
 2. `cd renamer`
 3. `pip3 install -r requirements.txt`
 4. `mv config.ini.example config.ini`
-5. Get yourself an API key from https://imdb-api.com/ by registering an account and instert the key in the config.ini file
+5. Get an API key from https://imdb-api.com/ by registering an account.
+6. Paste the API key in the config.ini file in line 3 (see below).
 ```
 [IMDB]
 language: EN
@@ -19,7 +20,10 @@ apikey: <insert_api_key_here>
 ```
 6. `ln -s /absolute/path/to/renamer.py /usr/local/bin/renamer`
 
+After installation you can call the program just by typing `renamer`. You should see a general help page about how to use the program. If it does not work make sure /usr/local/bin is in your $PATH environment variable (to check that type `echo $PATH`).
+
 # Usage
+
 ```
 Usage:
     renamer [options] [file]
