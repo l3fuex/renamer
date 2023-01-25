@@ -294,9 +294,11 @@ def main():
         # parse files in sys.argv
         filedata = parser.file_parser(i, options["debug"])
         infodata = parser.info_parser(i, options["debug"])
+        videodata = parser.video_parser(i, options["debug"])
         metadata = {}
         metadata.update(filedata)
         metadata.update(infodata)
+        metadata.update(videodata)
 
         # collect data from imdb
         try:
