@@ -122,7 +122,7 @@ def info_parser(file, debug=False):
         finally:
             file_object.close()
 
-        pattern = "https?://(?:www.)?imdb.com/title/(tt\\d*)"
+        pattern = "(?:www.)?imdb.com/title/(tt\\d*)"
         result = re.findall(pattern, content, re.IGNORECASE)
         if result:
             data["id"] = result[0]
