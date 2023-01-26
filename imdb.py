@@ -157,7 +157,7 @@ def get_episodes(key, lang, imdb_id, season, debug=False):
         "API/SeasonEpisodes" + "/" +
         key + "/" +
         imdb_id + "/" +
-        season
+        season.lstrip("0")
     )
     if debug:
         print("[DEBUG] sending api call {}".format(url))
