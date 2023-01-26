@@ -143,9 +143,13 @@ def video_parser(file, debug=False):
         data (dict): key value pairs of parsed data
     """
     data = {}
+    video_data = cv2.VideoCapture(file)
+
+    # extract dimension
+    data["height"] = int(video_data.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    data["width"] = int(video_data.get(cv2.CAP_PROP_FRAME_WIDTH))
 
     # extract duration
-    video_data = cv2.VideoCapture(file)
     frames = video_data.get(cv2.CAP_PROP_FRAME_COUNT)
     fps = video_data.get(cv2.CAP_PROP_FPS)
     if frames and fps:
