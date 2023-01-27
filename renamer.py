@@ -90,7 +90,7 @@ def input_validation():
             print(f'[ERROR] File "{sys.argv[i]}" not found')
             sys.argv.remove(sys.argv[i])
         elif not os.path.splitext(sys.argv[i])[1] in extensions:
-            print(f'[ERROR] File "{sys.argv[i]}" is not a media file')
+            print(f'[ERROR] Supported filetypes are {" ".join(extensions)}')
             sys.argv.remove(sys.argv[i])
         else:
             i += 1
