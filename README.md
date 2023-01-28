@@ -18,7 +18,7 @@ To achieve that the software tries to make precise search requests with as much 
 For the software to run python3 has to be installed on your machine. pip3 is needed to install some required python modules. Finally git is needed to actually download the program. Alternatively you can just download the .zip file from github in your browser.
 
 # Installation
-> Get an API key from https://imdb-api.com/ by setting up a free account and replace the pattern <INSERT_API_KEY_HERE> in the Configuration step with your API key.
+> Get an API key from https://imdb-api.com/ by setting up a free account.
 
 ## Linux
 + Download  
@@ -26,11 +26,9 @@ For the software to run python3 has to be installed on your machine. pip3 is nee
 + Install required python modules  
 `pip3 install -r requirements.txt`
 + Insert API key into configuration file  
-`mv config.ini.example config.ini && sed '3 s/$/<INSERT_API_KEY_HERE>/' config.ini`
-+ Create symbolic link to make program available across the system  
+ `mv config.ini.example config.ini && vi config.ini`  
++ Make program available across the system  
 `ln -s /ABSOLUTE/PATH/TO/renamer.py /usr/local/bin/renamer`
-
-After installation you should be able to call the program from anywhere in your system by typing `renamer` in a terminal. You should see a general help page about how to use the program. If it does not work make sure /usr/local/bin is in your $PATH environment variable.
 
 ## Windows
 + Download  
@@ -38,10 +36,11 @@ After installation you should be able to call the program from anywhere in your 
 + Install required python modules  
 `pip3 install -r requirements.txt`
 + Insert API key into configuration file  
-`move config.ini.example config.ini && config.ini`
-+ Add program path to environment variable to make program available across the system  
+`move config.ini.example config.ini && config.ini`  
++ Make program available across the system  
+`setx PATH %PATH%,C:\PATH\TO\RENAMER\DIR\`
 
-After installation you should be able to call the program from anywhere in your system by typing `renamer`in a terminal. You should see a general help page about how to use the program. If it does not work make sure /usr/local/bin is in your $PATH environment variable.
+After installation you should be able to call the program from anywhere in your system by typing `renamer` on Linux or `renamer.py` on Windows in a terminal. You should see a general help page about how to use the program. If it does not work make sure the program is in your PATH environment.
 
 # Usage
 Supported filetypes are:
