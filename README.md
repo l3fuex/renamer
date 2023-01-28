@@ -30,7 +30,18 @@ For the software to run python3 has to be installed on your machine. pip3 is nee
 + Create symbolic link to make program available across the system  
 `ln -s /ABSOLUTE/PATH/TO/renamer.py /usr/local/bin/renamer`
 
-After installation you should be able to call the program from anywhere in your system by typing `renamer`. You should see a general help page about how to use the program. If it does not work make sure /usr/local/bin is in your $PATH environment variable.
+After installation you should be able to call the program from anywhere in your system by typing `renamer` in a terminal. You should see a general help page about how to use the program. If it does not work make sure /usr/local/bin is in your $PATH environment variable.
+
+## Windows
++ Download  
+`git clone https://github.com/l3fuex/renamer.git && cd renamer`
++ Install required python modules  
+`pip3 install -r requirements.txt`
++ Insert API key into configuration file  
+`move config.ini.example config.ini && config.ini`
++ Add program path to environment variable to make program available across the system  
+
+After installation you should be able to call the program from anywhere in your system by typing `renamer`in a terminal. You should see a general help page about how to use the program. If it does not work make sure /usr/local/bin is in your $PATH environment variable.
 
 # Usage
 Supported filetypes are:
