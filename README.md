@@ -38,7 +38,7 @@ For the software to run python3 has to be installed on your machine. pip3 is nee
 + Insert API key into configuration file  
 `move config.ini.example config.ini && config.ini`  
 + Make program available across the system  
-`setx PATH %PATH%,C:\PATH\TO\RENAMER\DIR\`
+`setx PATH "%PATH%,C:\PATH\TO\RENAMER\DIR\"`
 
 After installation you should be able to call the program from anywhere in your system by typing `renamer` on Linux or `renamer.py` on Windows in a terminal. You should see a general help page about how to use the program. If it does not work make sure the program is in your PATH environment.
 
