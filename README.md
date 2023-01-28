@@ -45,7 +45,7 @@ After installation you should be able to call the program from anywhere in your 
 # Usage
 ```
 Usage:
-    renamer [options] [file1] [file2] [filen]
+    renamer [options] [file_1] [file_2] [file_n]
 
 Options:
     -a, --advanced-search  enable only advanced search mode
