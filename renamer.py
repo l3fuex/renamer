@@ -105,7 +105,7 @@ def input_validation():
 def print_help():
     """Prints out a general help page."""
     print("Usage:")
-    print("    renamer [options] [file]")
+    print("    renamer [options] [file1] [file2] [filen]")
     print("")
     print("Options:")
     print("    -a, --advanced-search  enable only advanced search mode")
@@ -117,7 +117,7 @@ def print_help():
     print("")
     print("Examples:")
     print("    renamer Alien.mkv")
-    print("    renamer -s Futurama/Season\\ {01..03}/*.mkv")
+    print("    renamer -s -v Alien.mkv")
     print("    renamer -o -1 futurama_S01E03_somename.mkv")
 
 
