@@ -105,7 +105,7 @@ def input_validation():
 def print_help():
     """Prints out a general help page."""
     print("Usage:")
-    print("    renamer [options] [file1] [file2] [filen]")
+    print("    renamer [options] [file_1] [file_2] [file_n]")
     print("")
     print("Options:")
     print("    -a, --advanced-search  enable only advanced search mode")
