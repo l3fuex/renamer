@@ -45,7 +45,7 @@ After installation you should be able to call the program from anywhere in your 
 # Usage
 ```
 Usage:
-    renamer [options] [file]
+    renamer [options] [file1] [file2] [filen]
 
 Options:
     -a, --advanced-search  enable only advanced search mode
@@ -57,6 +57,6 @@ Options:
 
 Examples:
     renamer Alien.mkv
-    renamer -s Futurama/Season\ {01..03}/*.mkv
+    renamer -s -v Alien.mkv
     renamer -o -1 futurama_S01E03_somename.mkv
 ```
